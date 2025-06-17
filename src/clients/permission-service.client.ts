@@ -33,16 +33,17 @@ export class PermissionServiceClient {
     console.log(`PermissionServiceClient initialized with baseUrl: ${this.baseUrl}`);
   }
 
-  async hasPermission(subjectId: string, domain: Domain, action: Action): Promise<boolean> {
+  async hasPermission(subjectId: string, domain: Domain, action: Action, tenantId?: string): Promise<boolean> {
     try {
-      console.log(`Checking permission for subjectId: ${subjectId}, domain: ${domain}, action: ${action}`);
+      console.log(`Checking permission for subjectId: ${subjectId}, domain: ${domain}, action: ${action}, tenantId: ${tenantId}`);
       const response = await axios.get<PermissionResponse>(
-        `${this.baseUrl}/permissions/check`,
+        `${this.baseUrl}/permissions/v2/check`,
         {
           params: {
             subjectId,
             domain,
-            action
+            action,
+            tenantId
           }
         }
       );
