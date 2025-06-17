@@ -12,16 +12,20 @@ export class UserController {
 
   async createUser(req: Request, res: Response): Promise<void> {
     try {
+      console.log('Creating new user...');
       const { name, email } = req.body;
       
       if (!name || !email) {
+        console.log('Name and email are required');
         res.status(400).json({ error: 'Name and email are required' });
         return;
       }
 
       const user = this.userService.createUser(name, email);
+      console.log('User created:', user);
       res.status(201).json(user);
     } catch (error) {
+      console.error('Error creating user:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
@@ -31,6 +35,7 @@ export class UserController {
       const userId = this.identityProvider.getUserId(req);
       
       if (!userId) {
+        console.log('User ID not provided');
         res.status(401).json({ error: 'User ID not provided' });
         return;
       }
@@ -42,6 +47,7 @@ export class UserController {
       );
 
       if (!hasPermission) {
+        console.log('Insufficient permissions');
         res.status(403).json({ error: 'Insufficient permissions' });
         return;
       }
@@ -49,12 +55,15 @@ export class UserController {
       const user = this.userService.getUserById(userId);
       
       if (!user) {
+        console.log('User not found');
         res.status(404).json({ error: 'User not found' });
         return;
       }
 
+      console.log('Returning user:', user);
       res.status(200).json(user);
     } catch (error) {
+      console.error('Error getting user:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
