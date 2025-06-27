@@ -81,9 +81,10 @@ describe('User Integration Tests', () => {
 
       // Mock permission service to allow access
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: 'test-tenant-id',
           domain: 'USER',
           action: 'LIST'
         })
@@ -91,7 +92,8 @@ describe('User Integration Tests', () => {
 
       const response = await request(app)
         .get('/users/me')
-        .set('identity-user-id', userId);
+        .set('identity-user-id', userId)
+        .set('identity-tenant-id', 'test-tenant-id');
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
@@ -109,14 +111,24 @@ describe('User Integration Tests', () => {
       expect(response.body.error).toBe('User ID not provided');
     });
 
+    it('should return 401 when tenant ID is not provided', async () => {
+      const response = await request(app)
+        .get('/users/me')
+        .set('identity-user-id', 'test-user-id');
+
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe('Tenant ID not provided');
+    });
+
     it('should return 403 when user does not have permission', async () => {
       const userId = 'test-user-id';
 
       // Mock permission service to deny access
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: 'test-tenant-id',
           domain: 'USER',
           action: 'LIST'
         })
@@ -124,7 +136,8 @@ describe('User Integration Tests', () => {
 
       const response = await request(app)
         .get('/users/me')
-        .set('identity-user-id', userId);
+        .set('identity-user-id', userId)
+        .set('identity-tenant-id', 'test-tenant-id');
 
       expect(response.status).toBe(403);
       expect(response.body.error).toBe('Insufficient permissions');
@@ -135,9 +148,10 @@ describe('User Integration Tests', () => {
 
       // Mock permission service to allow access
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: 'test-tenant-id',
           domain: 'USER',
           action: 'LIST'
         })
@@ -145,7 +159,8 @@ describe('User Integration Tests', () => {
 
       const response = await request(app)
         .get('/users/me')
-        .set('identity-user-id', userId);
+        .set('identity-user-id', userId)
+        .set('identity-tenant-id', 'test-tenant-id');
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe('User not found');
