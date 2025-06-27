@@ -40,10 +40,18 @@ export class UserController {
         return;
       }
 
+      const tenantId = this.identityProvider.getTenantId(req);
+      if (!tenantId) {
+        console.log('Tenant ID not provided');
+        res.status(401).json({ error: 'Tenant ID not provided' });
+        return;
+      }
+
       const hasPermission = await this.permissionServiceClient.hasPermission(
         userId,
         Domain.USER,
-        Action.LIST
+        Action.LIST,
+        tenantId
       );
 
       if (!hasPermission) {
