@@ -33,15 +33,17 @@ export class UserController {
   async getUser(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
+      const tenantId = this.identityProvider.getTenantId(req);
       
-      if (!userId) {
-        console.log('User ID not provided');
-        res.status(401).json({ error: 'User ID not provided' });
+      if (!userId || !tenantId) {
+        console.log('User ID or Tenant ID not provided');
+        res.status(401).json({ error: 'User ID or Tenant ID not provided' });
         return;
       }
 
       const hasPermission = await this.permissionServiceClient.hasPermission(
         userId,
+        tenantId,
         Domain.USER,
         Action.LIST
       );
